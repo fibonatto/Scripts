@@ -1,0 +1,70 @@
+#!/bin/zsh
+
+if [[ $# -ne 1 ]]; then
+    echo "usage: tn <session>"
+    exit 1
+fi
+
+session="$1"
+resurrect_dir="${TMUX_RESURRECT_DIR:-$HOME/.tmux/resurrect}"
+last="$resurrect_dir/last"
+restore="$HOME/.tmux/plugins/tmux-resurrect/scripts/restore.sh"
+
+if tmux has-session -t "$session" 2>/dev/null; then
+    if [[ -n "$TMUX" ]]; then
+        tmux switch-client -t "$session"
+    else
+        tmux attach-session -t "$session"
+    fi
+    exit 0
+fi
+
+if [[ ! -f "$last" ]]; then
+    echo "no resurrect snapshot found."
+    exit 1
+fi
+
+if ! awk -F '\t' -v session="$session" '
+    /^pane/ && $2 == session {
+        found = 1
+        exit
+    }
+    END {
+        exit !found
+    }
+' "$last"; then
+    echo "session '$session' not found in resurrect snapshot."
+    exit 1
+fi
+
+tmpdir="$(mktemp -d)" || exit 1
+
+awk -F '\t' -v session="$session" '
+    /^pane/   && $2 == session { print }
+    /^window/ && $2 == session { print }
+' "$last" > "$tmpdir/last"
+
+original_dir="$(tmux show-option -gqv @resurrect-dir 2>/dev/null)"
+
+tmux set-option -g @resurrect-dir "$tmpdir"
+
+"$restore"
+
+if [[ -n "$original_dir" ]]; then
+    tmux set-option -g @resurrect-dir "$original_dir"
+else
+    tmux set-option -gu @resurrect-dir
+fi
+
+rm -rf "$tmpdir"
+
+if tmux has-session -t "$session" 2>/dev/null; then
+    if [[ -n "$TMUX" ]]; then
+        tmux switch-client -t "$session"
+    else
+        tmux attach-session -t "$session"
+    fi
+else
+    echo "failed to restore session '$session'."
+    exit 1
+fi
