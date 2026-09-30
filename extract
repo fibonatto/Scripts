@@ -1,0 +1,33 @@
+#!/bin/zsh
+
+if [[ $# -ne 1 ]]; then
+    echo "usage: extract <archive>"
+    exit 1
+fi
+
+file="$1"
+
+if [[ ! -f "$file" ]]; then
+    echo "'$file' is not a valid file"
+    exit 1
+fi
+
+need() {
+    if ! command -v "$1" >/dev/null; then
+        echo "'$1' is required to extract '$file'"
+        exit 1
+    fi
+}
+
+case "$file" in
+    *.tar.bz2|*.tbz2) tar xjf "$file" ;;
+    *.tar.gz|*.tgz)   tar xzf "$file" ;;
+    *.tar)            tar xf "$file" ;;
+    *.bz2)            bunzip2 "$file" ;;
+    *.gz)             gunzip "$file" ;;
+    *.zip)            unzip "$file" ;;
+    *.Z)              uncompress "$file" ;;
+    *.rar)            need unrar; unrar e "$file" ;;
+    *.7z)             need 7z;    7z x "$file" ;;
+    *)                echo "'$file' cannot be extracted"; exit 1 ;;
+esac

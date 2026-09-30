@@ -1,0 +1,14 @@
+#!/bin/zsh
+
+if [[ $# -eq 0 ]]; then
+    echo "usage: ddg <query>"
+    exit 1
+fi
+
+query="$(python3 -c '
+import sys
+from urllib.parse import quote_plus
+print(quote_plus(" ".join(sys.argv[1:])))
+' "$@")"
+
+exec w3m "https://duckduckgo.com/?q=$query"
