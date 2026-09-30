@@ -16,8 +16,8 @@ tmux new-session -d -s "$session" -c "$PWD"
 tmux split-window -h -t "$session" -c "$PWD"
 tmux split-window -v -t "$session" -c "$PWD"
 
-tmux select-pane -t "$session"
-tmux send-keys 'nvim .' Enter
+tmux select-pane -t "$session" -L
+tmux send-keys -t "$session" 'nvim .' Enter
 
 if [[ -n "$TMUX" ]]; then
     tmux switch-client -t "$session"
