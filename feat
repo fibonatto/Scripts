@@ -1,0 +1,44 @@
+#!/bin/zsh
+
+if [[ $# -ne 1 ]]; then
+    echo "usage: feat <branch>"
+    exit 1
+fi
+
+branch="$1"
+
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    while git show-ref --verify --quiet "refs/heads/$branch" ||
+          git show-ref --verify --quiet "refs/remotes/origin/$branch"; do
+
+        echo "branch '$branch' already exists."
+
+        branch="${branch}-"
+
+        while true; do
+            printf "new: "
+            vared branch
+
+            if [[ -z "$branch" ]]; then
+                echo "branch name cannot be empty."
+                continue
+            fi
+
+            if [[ "$branch" =~ '^[a-zA-Z0-9._/-]+$' ]]; then
+                break
+            fi
+
+            echo "invalid branch name."
+        done
+    done
+else
+    git init
+fi
+
+if tmux has-session -t "$branch" 2>/dev/null; then
+    echo "tmux session '$branch' already exists."
+    exit 1
+fi
+
+git switch -c "$branch"
+tmux new-session -s "$branch" -c "$PWD"
