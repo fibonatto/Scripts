@@ -1,0 +1,512 @@
+#!/bin/sh
+# keybinds — referência rápida dos atalhos configurados.
+#
+# Seções: macOS (skhd + yabai), Kitty, tmux e Emacs.
+# POSIX sh + awk; sem dependências além de `tput` e `tr`. `fzf` e `less` são opcionais.
+#
+# Para adicionar ou alterar atalhos, edite apenas o bloco `data()` abaixo.
+# Formato (campos separados por "|"):
+#   S|id|Título|prefixo da seção|subtítulo     inicia uma seção
+#   G|Nome do grupo|prefixo do grupo           inicia um grupo (prefixo opcional)
+#   K|teclas|descrição|d                       atalho; "d" = direto, ignora o prefixo
+#   N|texto                                    observação exibida ao fim da seção
+# Linhas vazias e iniciadas por "#" são ignoradas.
+
+set -eu
+
+VERSION="2.0.0"
+PROG=${0##*/}
+
+# ---------------------------------------------------------------------------
+# Dados
+# ---------------------------------------------------------------------------
+
+data() {
+    cat <<'DATA'
+S|macos|macOS||skhd + yabai
+G|Janelas (yabai)
+K|Hyper + H|Focar janela à esquerda
+K|Hyper + J|Focar janela abaixo
+K|Hyper + K|Focar janela acima
+K|Hyper + L|Focar janela à direita
+K|Hyper + Space|Alternar janela flutuante do yabai
+K|Option + 1..9|Trocar de janela
+G|Aplicativos
+K|Hyper + Enter|Abrir Kitty
+K|Hyper + D|Abrir Discord
+K|Hyper + B|Abrir Safari
+K|Hyper + S|Abrir Stremio
+K|Hyper + P|Abrir PhotoCraft
+G|Utilitários
+K|Hyper + M|Abrir mpv com a URL/texto copiado na área de transferência
+K|Cmd + Shift + Enter|Executar ~/Scripts/qtb.sh
+
+S|kitty|Kitty||terminal
+G|Abas
+K|Cmd + 1..5|Ir para a aba 1..5
+K|Cmd + Shift + ]|Próxima aba
+K|Cmd + Shift + [|Aba anterior
+G|Splits
+K|Cmd + H/J/K/L|Navegar entre splits: esquerda/baixo/cima/direita
+K|Cmd + S|Criar split horizontal
+K|Cmd + T|Criar split vertical no diretório atual
+G|Janelas e notas
+K|Cmd + N|Nova janela do sistema
+K|Cmd + Shift + B|Abrir nova janela com nvim ~/Basal/index.md
+G|Aparência
+K|Option + T|Alternar tema
+
+S|tmux|tmux|Ctrl + S|multiplexador de terminal
+G|Navegação e tamanho de panes
+K|Option + H/J/K/L|Selecionar pane: esquerda/baixo/cima/direita|d
+K|H/J/K/L|Redimensionar pane: esquerda/baixo/cima/direita, 5 unidades
+G|Panes
+K|V|Split horizontal
+K|S|Split vertical
+K|X|Fechar pane, com confirmação
+K|Z|Alternar zoom do pane
+K|O|Selecionar pane anterior
+K|Q|Mostrar números dos panes
+K|R|Rotacionar panes
+K|!|Fechar os outros panes
+K|G|Abrir shell temporário (popup)
+K|Q|Fechar panes de runner e manter o pane 1
+G|Janelas e sessões
+K|C|Nova janela no diretório atual
+K|X|Fechar janela, com confirmação
+K|P|Janela anterior
+K|N|Próxima janela
+K|Tab|Última janela
+K|< / >|Mover janela para a esquerda/direita
+K|A|Renomear janela pelo diretório atual
+K|,|Renomear janela manualmente
+K|W|Abrir seletor em árvore
+K|1..9|Selecionar janela 1..9
+K|T|Alternar sessão (popup)
+K|D|Encerrar sessão, com confirmação
+G|Ferramentas e operações
+K|S|Alternar sincronização de panes
+K|O|Abrir seletor SSH (popup)
+K|F|Seletor de projetos (popup)
+K|G|Listar GitHub Actions (popup)
+K|D|Abrir Lazydocker (popup)
+K|Y|Abrir K9s (popup)
+K|Ctrl + A|Selecionar perfil AWS (popup)
+K|P|Salvar snapshot do pane
+K|E|Alternar logging contínuo
+K|V|Abrir o último log
+N|1. No tmux, maiúsculas normalmente exigem Shift. Todos os atalhos de janela/pane acima, exceto Option + H/J/K/L, usam o prefixo Ctrl + S.
+N|2. No tmux, maiúsculas e minúsculas são atalhos diferentes. Por exemplo, x e X acionam comandos distintos.
+
+S|emacs|Emacs||Evil mode · init-keymaps.el
+G|Janelas
+K|Ctrl + H/J/K/L|Navegar entre janelas: esquerda/baixo/cima/direita
+K|Ctrl + Setas|Navegar entre janelas (windmove)
+K|Setas|Redimensionar janela: esquerda -4 colunas, direita +4, cima +2 linhas, baixo -2
+G|Geral
+K|Meta + D|Alternar elcord-mode (Discord Rich Presence)
+K|Meta + T|Alternar tema (terrazzo-toggle)
+G|Edição
+K|U|Refazer (evil-redo)
+K|m|Saltar para o par correspondente (evil-jump-item)
+K|(|Desindentar linha
+K|)|Indentar linha
+K|!|Alternar comentário (também no modo visual)
+G|Edição (visual)
+K|<|Deslocar seleção para a esquerda, mantendo-a
+K|>|Deslocar seleção para a direita, mantendo-a
+K|S|Ordenar linhas da seleção
+G|Movimento (normal e visual)
+K|J|Salto inteligente para baixo (sb/smart-jump)
+K|K|Salto inteligente para cima (sb/smart-jump)
+K|H|Início do WORD anterior
+K|L|Início do próximo WORD
+G|Leader: arquivo e busca|,
+K|w|Salvar buffer
+K|q|Sair (evil-quit)
+K|b|Trocar de buffer (consult-buffer)
+K|rg|Busca com ripgrep (consult-ripgrep)
+K|/|Alternar comentário (normal e visual)
+G|Leader: git|,
+K|gs|Status do Magit
+K|gc|Log do branch atual (magit-log-current)
+G|Leader: LSP|,
+K|lh|Documentação no buffer (eldoc-doc-buffer)
+K|rn|Renomear símbolo (eglot-rename)
+K|d|Ir para a definição (xref)
+K|u|Voltar da definição (xref-go-back)
+G|Leader: comandos externos|,
+K|k|Executar kindcoder
+K|t|Executar ts-deps
+K|h|Executar holefill
+K|a|Executar agda2kind
+G|Leader: comando + prefixo|,
+K|c|Alternar comentário (normal e visual)
+K|ca|Code actions (eglot)
+K|f|Executar refactor
+K|ff|Repetir última busca (vertico-repeat)
+K|fm|Formatar buffer (eglot-format-buffer)
+K|s|Chat (sb/chatsh)
+K|sd|Símbolos do buffer (consult-imenu)
+K|sw|Buscar símbolo (xref-find-apropos)
+K|x|Salvar e sair (sb/save-and-quit)
+K|xx|Diagnósticos (consult-flymake)
+G|Build e quickfix
+K|F5|Compilar (sb/make)
+K|F6|Abrir quickfix (sb/copen)
+K|F7|Próximo erro
+K|F10|Erro anterior
+K|F9|Executar ./main
+G|Navegação de código
+K|gd|Ir para a definição
+K|gr|Buscar referências
+K|gi|Ir para a implementação (com eglot ativo)
+K|[d|Erro anterior (flymake)
+K|]d|Próximo erro (flymake)
+G|Painéis
+K|Ctrl + P|Abrir arquivo do projeto (project-find-file)
+K|Meta + A|Alternar NeoTree
+K|F8|Normal: painel de símbolos (imenu-list). Demais estados: NeoTree
+G|NeoTree (dentro do painel)
+K|Enter|Abrir arquivo ou expandir/recolher diretório
+K|Backspace|Subir para o diretório pai
+K|Delete|Subir para o diretório pai
+K|Left / Right|Diminuir/aumentar a largura do painel em 4 colunas
+G|Org (normal)
+K|Tab|Ciclar visibilidade (org-cycle)
+K|Shift + Tab|Ciclar visibilidade global (org-shifttab)
+N|Meta = M- do Emacs (Option no macOS, se mapeado). Salvo indicação, os atalhos valem no estado normal do Evil.
+N|Teclas "comando + prefixo": a tecla isolada executa o comando após uma pequena pausa (emula o timeoutlen = 300 do nvim).
+DATA
+}
+
+# ---------------------------------------------------------------------------
+# Motor de renderização (awk)
+# ---------------------------------------------------------------------------
+
+engine() { # $1 = list | full | search | flat
+    export KB_Q=$query
+    data | awk -v mode="$1" -v sel="$sel" -v width="$cols" -v prog="$PROG" \
+        -v hz="$hz" -v mark="$mark" \
+        -v c_rst="$c_rst" -v c_bold="$c_bold" -v c_dim="$c_dim" -v c_key="$c_key" \
+        -v c_ban="$c_ban" -v c_grp="$c_grp" -v c_sec="$c_sec" '
+function rep(ch, n,   s) { s = ""; while (n-- > 0) s = s ch; return s }
+function pad(s, n) { while (length(s) < n) s = s " "; return s }
+
+function wrap(text, w, indent,   n, words, i, line, out) {
+    n = split(text, words, " "); line = ""; out = ""
+    for (i = 1; i <= n; i++) {
+        if (line == "") line = words[i]
+        else if (length(line) + 1 + length(words[i]) <= w) line = line " " words[i]
+        else { out = out (out == "" ? "" : "\n" indent) line; line = words[i] }
+    }
+    return out (out == "" ? "" : "\n" indent) line
+}
+
+function ckey(s,   t) {
+    t = s
+    gsub(/ \+ /, c_rst c_dim " + " c_rst c_key, t)
+    return c_key t c_rst
+}
+
+function picked(id) { return index(sel, "," id ",") > 0 }
+
+function newgroup(name, pre) {
+    ng[cs]++
+    gname[cs, ng[cs]] = name
+    gpre[cs, ng[cs]] = (pre != "" ? pre : spre[cs])
+    nk[cs, ng[cs]] = 0
+}
+
+function fullkey(s, g, i,   p, k) {
+    k = key[s, g, i]; p = gpre[s, g]
+    if (p == "" || fl[s, g, i] == "d") return k
+    return (length(p) == 1) ? p k : p " " k
+}
+
+function desc(s, g, i,   d) {
+    d = dsc[s, g, i]
+    if (fl[s, g, i] == "d" && gpre[s, g] != "") d = d " (direto)"
+    return d
+}
+
+function hit(s, g, i,   h) {
+    if (q == "") return 1
+    h = tolower(sid[s] " " stitle[s] " " gname[s, g] " " fullkey(s, g, i) " " dsc[s, g, i])
+    return index(h, ql) > 0
+}
+
+function list(   s) {
+    printf "\n"
+    for (s = 1; s <= ns; s++) {
+        if (!picked(sid[s])) continue
+        printf "  %s%s%s  %s%3d%s  %s  %s%s%s\n", c_sec, pad(sid[s], 6), c_rst, \
+            c_dim, ntot[s], c_rst, stitle[s], c_dim, ssub[s], c_rst
+    }
+    printf "\n"
+    return 1
+}
+
+function full(   s, g, i, kw, wd, shown, total, j, ind) {
+    for (s = 1; s <= ns; s++) if (picked(sid[s])) { shown++; total += ntot[s] }
+    if (shown > 1)
+        printf "\n  %s%s%s  %s%d atalhos em %d seções%s\n", c_bold, "ATALHOS CONFIGURADOS", c_rst, c_dim, total, shown, c_rst
+    for (s = 1; s <= ns; s++) {
+        if (!picked(sid[s])) continue
+        kw = 0
+        for (g = 1; g <= ng[s]; g++)
+            for (i = 1; i <= nk[s, g]; i++)
+                if (length(key[s, g, i]) > kw) kw = length(key[s, g, i])
+        if (kw > 24) kw = 24
+        wd = width - 4 - kw - 2; if (wd < 30) wd = 30
+        ind = rep(" ", 4 + kw + 2)
+
+        printf "\n  %s %s %s  %s%s%s\n", c_ban, stitle[s], c_rst, c_dim, ssub[s], c_rst
+        printf "  %s%s%s\n", c_dim, rep(hz, width - 4), c_rst
+        if (spre[s] != "")
+            printf "  %sprefixo%s %s  %s(as teclas abaixo vêm depois dele, salvo as marcadas como diretas)%s\n", \
+                c_dim, c_rst, ckey(spre[s]), c_dim, c_rst
+
+        for (g = 1; g <= ng[s]; g++) {
+            printf "\n"
+            if (gname[s, g] != "") printf "  %s%s %s%s", c_grp, mark, gname[s, g], c_rst
+            if (gpre[s, g] != "" && gpre[s, g] != spre[s])
+                printf "  %sprefixo%s %s", c_dim, c_rst, ckey(gpre[s, g])
+            printf "\n"
+            for (i = 1; i <= nk[s, g]; i++)
+                printf "    %s%s  %s\n", ckey(key[s, g, i]), rep(" ", kw - length(key[s, g, i])), \
+                    wrap(desc(s, g, i), wd, ind)
+        }
+        if (nn[s] > 0) {
+            printf "\n"
+            for (j = 1; j <= nn[s]; j++)
+                printf "  %s%s%s\n", c_dim, wrap(note[s, j], width - 4, "     "), c_rst
+        }
+    }
+    if (shown > 1)
+        printf "\n  %sdica: %s -s TERMO para buscar · %s -i para busca interativa%s\n", c_dim, prog, prog, c_rst
+    printf "\n"
+    return 1
+}
+
+function search(   s, g, i, m, ms, mg, mi, kw, k, n, wd, sw) {
+    m = 0; kw = 0; sw = 5
+    for (s = 1; s <= ns; s++) {
+        if (!picked(sid[s])) continue
+        for (g = 1; g <= ng[s]; g++)
+            for (i = 1; i <= nk[s, g]; i++)
+                if (hit(s, g, i)) {
+                    m++; ms[m] = s; mg[m] = g; mi[m] = i
+                    k = length(fullkey(s, g, i)); if (k > kw) kw = k
+                }
+    }
+    if (m == 0) {
+        printf "%s: nenhum atalho encontrado para \"%s\"\n", prog, q > "/dev/stderr"
+        return 0
+    }
+    if (kw > 30) kw = 30
+    wd = width - 2 - sw - 2 - kw - 2; if (wd < 30) wd = 30
+    if (mode == "search")
+        printf "\n  %s%d resultado%s para \"%s\"%s\n\n", c_dim, m, (m == 1 ? "" : "s"), q, c_rst
+    for (n = 1; n <= m; n++) {
+        s = ms[n]; g = mg[n]; i = mi[n]
+        k = fullkey(s, g, i)
+        printf "  %s%s%s  %s%s  %s\n", c_sec, pad(sid[s], sw), c_rst, ckey(k), rep(" ", kw - length(k)), \
+            wrap(desc(s, g, i), wd, rep(" ", 2 + sw + 2 + kw + 2))
+    }
+    if (mode == "search") printf "\n"
+    return m
+}
+
+BEGIN { q = ENVIRON["KB_Q"]; ql = tolower(q) }
+
+/^[ \t]*(#|$)/ { next }
+
+{
+    split($0, f, "|")
+    if (f[1] == "S") {
+        cs = ++ns; sid[cs] = f[2]; stitle[cs] = f[3]; spre[cs] = f[4]; ssub[cs] = f[5]
+    } else if (f[1] == "G") {
+        newgroup(f[2], f[3])
+    } else if (f[1] == "K") {
+        if (ng[cs] == 0) newgroup("", "")
+        i = ++nk[cs, ng[cs]]
+        key[cs, ng[cs], i] = f[2]; dsc[cs, ng[cs], i] = f[3]; fl[cs, ng[cs], i] = f[4]
+        ntot[cs]++
+    } else if (f[1] == "N") {
+        nn[cs]++; note[cs, nn[cs]] = f[2]
+    }
+}
+
+END {
+    if (mode == "list") r = list()
+    else if (mode == "full") r = full()
+    else r = search()
+    exit(r > 0 ? 0 : 1)
+}'
+}
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+die() {
+    printf '%s: %s\n' "$PROG" "$*" >&2
+    exit 2
+}
+
+usage() {
+    cat <<EOF
+$PROG $VERSION — referência rápida dos atalhos configurados
+
+Uso:
+  $PROG [opções] [seção...]
+
+Seções:
+  $SECTION_IDS (padrão: todas)
+  Aliases: skhd, yabai, mac -> macos · el -> emacs
+
+Opções:
+  -s, --search TERMO   busca em teclas, descrições, grupos e seções
+  -l, --list           lista as seções e a quantidade de atalhos
+  -f, --flat           uma linha por atalho, sem cores (para grep/fzf)
+  -i, --interactive    busca incremental com fzf
+      --color=QUANDO   auto (padrão), always ou never
+      --no-color       equivale a --color=never (respeita também NO_COLOR)
+      --no-pager       não usa o pager (PAGER, padrão: less)
+  -h, --help           mostra esta ajuda
+  -V, --version        mostra a versão
+
+Exemplos:
+  $PROG                       todos os atalhos
+  $PROG tmux emacs            apenas tmux e Emacs
+  $PROG -s split              busca "split" em todas as seções
+  $PROG -s "ctrl + s" tmux    busca restrita ao tmux
+  $PROG -i                    busca interativa
+  $PROG -f | grep -i leader   saída plana para pipelines
+EOF
+}
+
+resolve() { # normaliza um nome de seção em $RESOLVED
+    _a=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+    case $_a in
+        skhd | yabai | mac) _a=macos ;;
+        el) _a=emacs ;;
+        todos) _a=all ;;
+    esac
+    case " all $SECTION_IDS " in
+        *" $_a "*) RESOLVED=$_a ;;
+        *) die "seção desconhecida: $1 (disponíveis: $SECTION_IDS)" ;;
+    esac
+}
+
+setup_style() {
+    case $color in
+        always) use_color=1 ;;
+        never) use_color=0 ;;
+        auto)
+            if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != dumb ]; then
+                use_color=1
+            else
+                use_color=0
+            fi
+            ;;
+        *) die "--color espera auto, always ou never" ;;
+    esac
+
+    # Flat/interativo sempre sem cor e sem quebra de linha.
+    case $mode in flat | interactive) use_color=0 ;; esac
+
+    c_rst= c_bold= c_dim= c_key= c_ban= c_grp= c_sec=
+    if [ "$use_color" -eq 1 ]; then
+        esc=$(printf '\033')
+        c_rst="${esc}[0m"
+        c_bold="${esc}[1m"
+        c_dim="${esc}[2m"
+        c_key="${esc}[1;36m"
+        c_ban="${esc}[1;7;36m"
+        c_grp="${esc}[1m"
+        c_sec="${esc}[33m"
+    fi
+
+    case ${LC_ALL:-${LC_CTYPE:-${LANG:-}}} in
+        *[Uu][Tt][Ff]-8* | *[Uu][Tt][Ff]8*) hz='─' mark='▸' ;;
+        *) hz='-' mark='>' ;;
+    esac
+
+    cols=$(tput cols 2>/dev/null || true)
+    case $cols in '' | *[!0-9]*) cols=${COLUMNS:-80} ;; esac
+    case $cols in '' | *[!0-9]*) cols=80 ;; esac
+    [ "$cols" -le 100 ] || cols=100
+    [ "$cols" -ge 50 ] || cols=50
+    case $mode in flat | interactive) cols=10000 ;; esac
+}
+
+run_paged() {
+    pager_cmd=${PAGER:-less}
+    if [ "$pager" = never ] || [ ! -t 1 ] || ! command -v "${pager_cmd%% *}" >/dev/null 2>&1; then
+        "$@"
+        return
+    fi
+    LESS="${LESS:+$LESS }-FRX"
+    export LESS
+    # shellcheck disable=SC2086 # PAGER pode conter argumentos
+    "$@" | $pager_cmd
+}
+
+main() {
+    SECTION_IDS=$(data | awk -F'|' '$1 == "S" { printf "%s%s", sep, $2; sep = " " }')
+
+    color=auto pager=auto mode=render query= sections=
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h | --help) usage; exit 0 ;;
+            -V | --version) printf '%s %s\n' "$PROG" "$VERSION"; exit 0 ;;
+            -l | --list) mode=list ;;
+            -f | --flat) mode=flat ;;
+            -i | --interactive) mode=interactive ;;
+            -s | --search)
+                [ $# -ge 2 ] || die "$1 requer um termo"
+                query=$2
+                shift
+                ;;
+            --search=*) query=${1#*=} ;;
+            --color=*) color=${1#*=} ;;
+            --no-color) color=never ;;
+            --no-pager) pager=never ;;
+            --) shift; break ;;
+            -*) die "opção desconhecida: $1 (use --help)" ;;
+            *) resolve "$1"; sections="$sections $RESOLVED" ;;
+        esac
+        shift
+    done
+    for a in "$@"; do resolve "$a"; sections="$sections $RESOLVED"; done
+
+    case " $sections " in *" all "*) sections= ;; esac
+    [ -n "$sections" ] || sections=$SECTION_IDS
+    sel=,
+    for s in $sections; do sel="$sel$s,"; done
+
+    setup_style
+
+    case $mode in
+        list) engine list ;;
+        flat) engine flat ;;
+        interactive)
+            command -v fzf >/dev/null 2>&1 || die "fzf não encontrado (brew install fzf)"
+            initial=$query
+            query=
+            engine flat | fzf --layout=reverse --height=80% --border \
+                --prompt='atalho > ' --query="$initial" || true
+            ;;
+        render)
+            if [ -n "$query" ]; then
+                engine search
+            else
+                run_paged engine full
+            fi
+            ;;
+    esac
+}
+
+main "$@"
