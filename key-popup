@@ -1,0 +1,17 @@
+#!/bin/sh
+# Prompt rápido para o keybinds. Linha vazia ou Ctrl+D fecha a janela.
+set -f
+KB="$HOME/.local/bin/keybinds"
+
+while :; do
+    printf '\033[2J\033[H'
+    printf 'atalhos > '
+    IFS= read -r q || exit 0
+    [ -n "$q" ] || exit 0
+
+    # Tenta como seção(ões) (macos, kitty, "tmux emacs"); senão, busca por termo.
+    out=$("$KB" --color=always --no-pager $q 2>/dev/null) ||
+        out=$("$KB" --color=always -s "$q" 2>&1)
+
+    printf '%s\n' "$out" | less -R   # q volta ao prompt
+done
