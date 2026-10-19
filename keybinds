@@ -31,6 +31,9 @@ K|Hyper + K|Focar janela acima
 K|Hyper + L|Focar janela à direita
 K|Hyper + Space|Alternar janela flutuante do yabai
 K|Option + 1..9|Trocar de janela
+G|Spaces (yabai)
+K|Hyper + 1..6|Ir para o space 1..6
+K|Ctrl + Option + 1..6|Mover a janela focada para o space 1..6 e acompanhá-la
 G|Aplicativos
 K|Hyper + Enter|Abrir Kitty
 K|Hyper + D|Abrir Discord
@@ -38,8 +41,10 @@ K|Hyper + B|Abrir Safari
 K|Hyper + S|Abrir Stremio
 K|Hyper + P|Abrir PhotoCraft
 G|Utilitários
+K|Hyper + A|Abrir este popup de atalhos
 K|Hyper + M|Abrir mpv com a URL/texto copiado na área de transferência
 K|Cmd + Shift + Enter|Executar ~/Scripts/qtb.sh
+N|Spaces: 1 kitty, 2 web, 3 discord, 4 social, 5 media, 6 other.
 
 S|kitty|Kitty||terminal
 G|Abas
